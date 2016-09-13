@@ -1,0 +1,106 @@
+<html>
+<head>
+	<title>WiFi Provisioning System</title>
+	<meta charset="utf-8">
+	<meta description="A page to configure WiFi via BLE">
+	<meta author="Ben Hardill">
+	<!-- Origin Trial Token, feature = Web Bluetooth, origin = https://www.hardill.me.uk, expires = 2016-09-07 -->
+	<meta http-equiv="origin-trial" content="Agg+RDA67YlmdDAZD2FQZeISZ8tvzw1osOl0a1UUlyz63eZUP2OYDsbzYTJ4RtENDHXw3QVvmbznnx/kPJWREwEAAABceyJvcmlnaW4iOiAiaHR0cHM6Ly93d3cuaGFyZGlsbC5tZS51azo0NDMiLCAiZmVhdHVyZSI6ICJXZWJCbHVldG9vdGgiLCAiZXhwaXJ5IjogMTQ3MzI2NTAzMH0=">
+</head>
+<body>
+	<div><button id="find">Find Device</button></div>
+	<div id="input" hidden>
+		<div><label for="ssid">SSID:</label><input type="text" name="ssid" id="ssid"></div>
+		<div><label for="password">Password:</label><input type="text" name="password" id="password"></div>
+		<div><label for="enc">Security Type</label>
+			<select name="enc" id="enc">
+				<option>WPA</option>
+				<option>WEP</option>
+			</select>
+		</div>
+		<div><button id="send">Configure</button></div>
+	</div>
+	<div id="message"></div>
+	<div id="ipaddress"></div>
+	<script type="text/javascript">
+		var bluetoothDevice;
+		var gattServer;
+		var ssidChar;
+		var passwordChar;
+		var ipChar;
+		if(navigator.bluetooth) {
+			function findDevice() {
+				navigator.bluetooth.requestDevice({
+					filters: [{
+						namePrefix: 'zero-clock'
+					}],
+					optionalServices: ['f9ea9184-8645-4cdc-a379-164a922fa410']
+				})
+				.then(device => {
+					bluetoothDevice = device;
+					console.log(device);
+					return bluetoothDevice.gatt.connect();
+					//return bluetoothDevice.connectGATT();
+				})
+				.then(server => {
+					return server.getPrimaryService('f9ea9184-8645-4cdc-a379-164a922fa410');
+				})
+				.then(service => {
+
+					if (service) {
+						service.getCharacteristic('f9ea9184-8645-4cdc-a379-164a922fa411')
+						.then(char => {ssidChar = char});
+						service.getCharacteristic('f9ea9184-8645-4cdc-a379-164a922fa412')
+						.then(char => {passwordChar = char});
+						service.getCharacteristic('f9ea9184-8645-4cdc-a379-164a922fa413')
+						.then(char => {
+							ipChar = char;
+							ipChar.startNotifications()
+							.then(_ => {
+								ipChar.addEventListener('characteristicvaluechanged',function(event){
+									var value = event.target.value;
+									var decoder = new TextDecoder();
+									var ip = decoder.decode(value);
+									console.log(ip);
+									document.getElementById('ipaddress').innerHTML = "<a href='http://" + ip + "'>Connect</a>";
+								});
+							});
+						});
+					} else {
+						console.log("no service found");
+					}
+				})
+				.then(_ => {
+					document.getElementById('find').hidden = true;
+					document.getElementById('input').hidden = false;
+				});
+			}
+
+			function sendDetails(){
+				var encoder = new TextEncoder();
+				var ssid = document.getElementById('ssid').value;
+				var password = document.getElementById('password').value;
+				if (ssidChar && passwordChar) {
+					var buffer = encoder.encode(ssid);
+					console.log(buffer);
+					ssidChar.writeValue(buffer)
+					.then(function(){
+						var buffer = encoder.encode(password);
+						console.log(buffer);
+						passwordChar.writeValue(buffer);
+					});
+
+					document.getElementById('input').hidden = true;
+				}
+			}
+
+			document.getElementById('find').onclick = findDevice;
+			document.getElementById('send').onclick = sendDetails;
+		} else {
+			document.getElementById("find").disabled = true;
+			document.getElementById("message").innerHTML = "This browser does not support WebBluetooth";
+
+		}
+	</script>
+</body>
+</html>
