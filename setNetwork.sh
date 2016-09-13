@@ -1,11 +1,11 @@
 #!/bin/sh
 
-#ifdown wlan0
+ifdown wlan0
 
 SSID="$1"
 PASS="$2"
 
-cat << EOF > ./wpa_supplicant.conf
+cat << EOF > /etc/wpa_supplicant/wpa_supplicant.conf
 country=GB
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
@@ -20,4 +20,4 @@ network={
 }
 EOF
 
-#ifup wlan0
+ifup wlan0
