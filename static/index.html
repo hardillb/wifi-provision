@@ -69,7 +69,7 @@
 									var ssid = decoder.decode(value);
 									ssid = ssid.substring(1,ssid.length -1);
 									console.log(ssid);
-									if (ssids.indexOf(ssid) == -1) {
+									if (ssids.indexOf(ssid) == -1 && ssid !== '') {
 										ssids.push(ssid);
 										var option = document.createElement('option');
 										option.setAttribute('value', ssid);
@@ -130,7 +130,7 @@
 								var decoder = new TextDecoder();
 								var ip = decoder.decode(value);
 								console.log(ip);
-								document.getElementById('ipaddress').innerHTML = "<a href='http://" + ip + "'>Connect</a>";
+								document.getElementById('ipaddress').innerHTML = "<a href='http://" + ip + "'>Connect to configured device</a>";
 							});
 							console.log("addEventListener");
 						})
