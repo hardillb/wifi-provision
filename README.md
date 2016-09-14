@@ -18,4 +18,4 @@ You can now run this as root
     node index.js
 
 It should now broadcast the short URL as a Eddystone beacon, when you follow the link you will get a page that will connect to the
-device and allow you to push SSID and password to it. Once connected it will send the device IP address back to the page. 
+device and allow you to push SSID and password to it. Once connected it will send the device IP address back to the page.

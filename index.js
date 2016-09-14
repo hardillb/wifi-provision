@@ -3,6 +3,7 @@ var bleno = require('bleno');
 var eddystone = require('eddystone-beacon');
 
 var exec = require('child_process').exec;
+var path = require('path');
 
 var SSIDCharacteristic = require('./lib/SSIDCharacteristic');
 var PasswordCharacteristic = require('./lib/PasswordCharacteristic');
@@ -26,7 +27,9 @@ function newPassword(newPass) {
   console.log(newPass.toString('utf8'));
   password = newPass.toString('utf8');
 
-  // exec('setNetwork.sh',[ssid, password],(err, stdout, stderr) => {
+  var script = path.join(__dirname, 'setNetwork.sh');
+
+  // exec(script,[ssid, password], function(err, stdout, stderr) {
   //   if (err) {
   //     console.log(err);
   //   }
@@ -49,10 +52,10 @@ function newPassword(newPass) {
 
 function checkIPAddress() {
   var interfaces = os.networkInterfaces();
-  //if (interfaces['wlan0']) {
-  if (interfaces['usb0']) {
-    //var wlan0 = interfaces['wlan0'];
-    var wlan0 = interfaces['usb0'];
+  if (interfaces['wlan0']) {
+  //if (interfaces['usb0']) {
+    var wlan0 = interfaces['wlan0'];
+    //var wlan0 = interfaces['usb0'];
     for (var i=0; i< wlan0.length; i++) {
       if (wlan0[i].family === 'IPv4') {
         console.log(wlan0[i].address);
@@ -62,24 +65,6 @@ function checkIPAddress() {
     }
   }
 } 
-
-// //check for ipAddress every 10 seconds
-// var interval = setInterval(checkIPAddress,10000);
-// function checkIPAddress() {
-//   var interfaces = os.networkInterfaces();
-//   //if (interfaces['wlan0']) {
-//   if (interfaces['usb0']) {
-//     //var wlan0 = interfaces['wlan0'];
-//     var wlan0 = interfaces['usb0'];
-//     for (var i=0; i< wlan0.length; i++) {
-//       if (wlan0[i].family === 'IPv4') {
-//         console.log(wlan0[i].address);
-//         ipAddressChar.update(wlan0[i].address);
-//         //clearInterval(interval);
-//       }
-//     }
-//   }
-// } 
 
 var service = new bleno.PrimaryService({
 	uuid: 'f9ea9184-8645-4cdc-a379-164a922fa410',
