@@ -3,7 +3,7 @@
 This is a NodeJS app to configure WiFi on a Raspberry Pi 3 or a 
 Pi Zero with IoT pHAT via Bluetooth Low Energy and Web Bluetooth.
 
-The reasons for this can be found [here](http://www.hardill.me.uk/wordpress/2016/09/10/provisioning-wifi-iot-devices/)
+The reasons for this can be found [here](http://www.hardill.me.uk/wordpress/2016/09/13/provisioning-wifi-iot-devices/)
 
 To run clone the code
 
